@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\Blue.png" />
+    <None Remove="Assets\DBlue.png" />
+    <None Remove="Assets\Empty.png" />
+    <None Remove="Assets\GameBoard.png" />
+    <None Remove="Assets\Green.png" />
+    <None Remove="Assets\LBend-Piece.png" />
+    <None Remove="Assets\Line-Piece.png" />
+    <None Remove="Assets\None-Piece.png" />
+    <None Remove="Assets\Orange.png" />
+    <None Remove="Assets\Plus-Piece.png" />
+    <None Remove="Assets\Purple.png" />
+    <None Remove="Assets\RBend-Piece.png" />
+    <None Remove="Assets\Red.png" />
+    <None Remove="Assets\Square-Piece.png" />
+    <None Remove="Assets\Yellow.png" />
+    <None Remove="Assets\Zag-Piece.png" />
+    <None Remove="Assets\Zig-Piece.png" />
+    <None Remove="empty_tile.gif" />
+    <None Remove="GameBoard.png" />
+    <None Remove="tile.gif" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Blue.png" />
+    <Resource Include="Assets\DBlue.png" />
+    <Resource Include="Assets\Empty.png" />
+    <Resource Include="Assets\GameBoard.png" />
+    <Resource Include="Assets\Green.png" />
+    <Resource Include="Assets\LBend-Piece.png" />
+    <Resource Include="Assets\Line-Piece.png" />
+    <Resource Include="Assets\None-Piece.png" />
+    <Resource Include="Assets\Orange.png" />
+    <Resource Include="Assets\Plus-Piece.png" />
+    <Resource Include="Assets\Purple.png" />
+    <Resource Include="Assets\RBend-Piece.png" />
+    <Resource Include="Assets\Red.png" />
+    <Resource Include="Assets\Square-Piece.png" />
+    <Resource Include="Assets\Yellow.png" />
+    <Resource Include="Assets\Zag-Piece.png" />
+    <Resource Include="Assets\Zig-Piece.png" />
+    <Resource Include="GameBoard.png" />
+  </ItemGroup>
+
+</Project>
