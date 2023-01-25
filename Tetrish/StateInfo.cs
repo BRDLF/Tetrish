@@ -22,7 +22,7 @@ namespace Tetrish
                 {
                     currentPiece.Move(1, 0);
 
-                    if(!PieceFits())
+                    if (!PieceFits())
                     {
                         currentPiece.Move(-1, 0);
                     }
@@ -34,6 +34,8 @@ namespace Tetrish
         public PiecePicker PiecePicker { get; }
         public bool GameOver { get; private set; }
         public int Score { get; private set; }
+        public int Level { get; private set; }
+        private int LinesCleared = 0;
         public Piece HeldPiece { get; private set; }
         public bool CanHold { get; private set; }
 
@@ -41,6 +43,7 @@ namespace Tetrish
         {
             GameBoard = new GameBoard();
             PiecePicker = new PiecePicker();
+            Level = 1;
             currentPiece = PiecePicker.NewPiece();
             CanHold = true;
         }
@@ -110,7 +113,12 @@ namespace Tetrish
                 GameBoard[p.row, p.column] = CurrentPiece.Id;
             }
 
-            Score += GameBoard.ClearRows();
+            Score += CalculateScore();
+            if (LinesCleared >= 10)
+            {
+                LevelUp();
+            }
+            
 
             if (IsGameEnd())
             {
@@ -121,6 +129,35 @@ namespace Tetrish
                 CurrentPiece = PiecePicker.NewPiece();
                 CanHold = true;
             }
+        }
+
+        private void LevelUp()
+        {
+            Level++;
+            LinesCleared %= 10;
+        }
+
+        public int CalculateScore()
+        {
+            int points = 0;
+            int Cleared = GameBoard.ClearRows();
+            LinesCleared += Cleared;
+            switch (Cleared)
+            {
+                case 4: 
+                    points = 1200;
+                    break;
+                case 3:
+                    points = 300;
+                    break;
+                case 2:
+                    points = 100;
+                    break;
+                case 1:
+                    points = 40;
+                    break;
+            }
+            return points * Level;
         }
 
         public void MovePieceDown()

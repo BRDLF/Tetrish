@@ -12,9 +12,6 @@
 
         <local:GameBoard x:Key="gameBoard" />
 
-        <local:MathDoubler x:Key="mathDoubler" />
-        <local:MathHalfer x:Key="mathHalfer" />
-
         <DataTemplate x:Key="lvl2">
             <Image Source="{Binding}" Height="10" Width="10" />
         </DataTemplate>
@@ -73,6 +70,12 @@
                    Height="64"/>
 
                 <TextBlock TextAlignment="Center"
+                       Text="Level"/>
+                <TextBlock x:Name="LevelCounter"
+                       TextAlignment="Center"
+                       Text="1"/>
+
+                <TextBlock TextAlignment="Center"
                        Text="Score"/>
                 <TextBlock x:Name="ScoreCounter"
                        TextAlignment="Center"
@@ -81,7 +84,7 @@
         </Viewbox>
 
         <Grid x:Name="GameOverScreen"
-              Grid.ColumnSpan="3"
+              Grid.ColumnSpan="4"
               Grid.RowSpan="2"
               Visibility="Hidden">
             <Grid.Background>

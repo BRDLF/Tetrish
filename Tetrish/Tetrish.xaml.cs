@@ -126,6 +126,7 @@ namespace Tetrish
             DrawNextPiece(stateInfo.PiecePicker);
             DrawHeld(stateInfo.HeldPiece);
             ScoreCounter.Text = $"{stateInfo.Score}";
+            LevelCounter.Text = $"{stateInfo.Level}";
         }
 
         private void DrawHeld(Piece heldPiece)
@@ -147,7 +148,7 @@ namespace Tetrish
 
             while (!stateInfo.GameOver)
             {
-                int delay = Math.Max(minDelay, maxDelay - (stateInfo.Score * delayDecrease));
+                int delay = Math.Max(minDelay, maxDelay - ((stateInfo.Level -1 )* delayDecrease));
                 await Task.Delay(delay);
                 stateInfo.MovePieceDown();
                 Draw(stateInfo);
