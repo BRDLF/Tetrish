@@ -8,7 +8,7 @@ namespace Tetrish
 {
     internal class PiecePicker
     {
-        private readonly Piece[] pieces = new Piece[] 
+        private readonly Piece[] pieces = new Piece[]
         { 
             new LinePiece(),
             new RBend_Piece(),

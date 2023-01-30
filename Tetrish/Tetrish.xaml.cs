@@ -15,9 +15,6 @@ using System.Windows.Threading;
 
 namespace Tetrish
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private readonly ImageSource[] tileSources = new ImageSource[]
@@ -45,9 +42,9 @@ namespace Tetrish
         };
 
         private readonly Image[,] imageControls;
-        private readonly int maxDelay = 1000;
-        private readonly int minDelay = 75;
-        private readonly int delayDecrease = 25;
+        private const int maxDelay = 1000;
+        private const int minDelay = 100;
+        private const int delayDecrease = 50;
 
         private StateInfo stateInfo = new StateInfo();
         MainWindow()
@@ -58,12 +55,12 @@ namespace Tetrish
 
         private Image[,] SetupGameCanvas(GameBoard grid)
         {
-            Image[,] imageControls = new Image[grid.Rows, grid.Columns];
+            Image[,] imageControls = new Image[grid.ROWS, grid.COLS];
             int cellSize = 16;
 
-            for (int r = 0; r < grid.Rows; r++)
+            for (int r = 0; r < grid.ROWS; r++)
             {
-                for (int c = 0; c < grid.Columns; c++) 
+                for (int c = 0; c < grid.COLS; c++) 
                 {
                     Image imageControl = new Image
                     {
@@ -80,11 +77,22 @@ namespace Tetrish
             return imageControls;
         }
 
+        //DRAW METHODS
+        private void Draw(StateInfo stateInfo)
+        {
+            DrawGrid(stateInfo.GameBoard);
+            DrawGhostPiece(stateInfo.CurrentPiece);
+            DrawPiece(stateInfo.CurrentPiece);
+            DrawNextPiece(stateInfo.PiecePicker);
+            DrawHeld(stateInfo.HeldPiece);
+            ScoreCounter.Text = $"{stateInfo.Score}";
+            LevelCounter.Text = $"{stateInfo.Level}";
+        }
         private void DrawGrid(GameBoard grid)
         {
-            for (int r = 0; r < grid.Rows; r++)
+            for (int r = 0; r < grid.ROWS; r++)
             {
-                for (int c = 0; c < grid.Columns; c++)
+                for (int c = 0; c < grid.COLS; c++)
                 {
                     int id = grid[r, c];
                     imageControls[r, c].Opacity = 1;
@@ -100,7 +108,6 @@ namespace Tetrish
                 imageControls[p.row, p.column].Source = tileSources[piece.Id];
             }
         }
-
         private void DrawGhostPiece(Piece piece)
         {
             int dropDistance = stateInfo.PieceDropDistance();
@@ -111,25 +118,19 @@ namespace Tetrish
                 imageControls[p.row + dropDistance, p.column].Source= tileSources[piece.Id];
             }
         }
-
         private void DrawNextPiece(PiecePicker piecePicker)
         {
-            Piece next = piecePicker.NextPiece;
-            NextImage.Source = pieceSources[next.Id];
+            if(stateInfo.stateMode == StateInfo.StateMode.Playing || stateInfo.stateMode == StateInfo.StateMode.Paused)
+            {
+                Piece next = piecePicker.NextPiece;
+                NextImage.Source = pieceSources[next.Id];
+            }
+            else
+            {
+                NextImage.Source = pieceSources[0];
+            }
         }
-
-        private void Draw(StateInfo stateInfo)
-        {
-            DrawGrid(stateInfo.GameBoard);
-            DrawGhostPiece(stateInfo.CurrentPiece);
-            DrawPiece(stateInfo.CurrentPiece);
-            DrawNextPiece(stateInfo.PiecePicker);
-            DrawHeld(stateInfo.HeldPiece);
-            ScoreCounter.Text = $"{stateInfo.Score}";
-            LevelCounter.Text = $"{stateInfo.Level}";
-        }
-
-        private void DrawHeld(Piece heldPiece)
+        private void DrawHeld(Piece? heldPiece)
         {
             if (heldPiece == null)
             {
@@ -146,28 +147,63 @@ namespace Tetrish
         {
             Draw(stateInfo);
 
-            while (!stateInfo.GameOver)
+            while (true)
             {
-                int delay = Math.Max(minDelay, maxDelay - ((stateInfo.Level -1 )* delayDecrease));
-                await Task.Delay(delay);
-                stateInfo.MovePieceDown();
-                Draw(stateInfo);
+                
+                switch (stateInfo.stateMode)
+                {
+                    case StateInfo.StateMode.Paused:
+                        await Task.Delay(1000);
+                        break;
+                    case StateInfo.StateMode.Playing:
+                        int delay = Math.Max(minDelay, maxDelay - ((stateInfo.Level - 1) * delayDecrease));
+                        stateInfo.MovePieceDown();
+                        Draw(stateInfo);
+                        await Task.Delay(delay);
+                        break;
+                    case StateInfo.StateMode.Menu:
+                        await Task.Delay(1000);
+                        Draw(stateInfo);
+                        break;
+                    case StateInfo.StateMode.GameOver:
+                        FinalScore.Text = $"Score: {stateInfo.Score}";
+                        GameOverScreen.Visibility = Visibility.Visible;
+                        await Task.Delay(1000);
+                        Draw(stateInfo);
+                        break;
+                }
             }
 
-            GameOverScreen.Visibility = Visibility.Visible;
-            FinalScore.Text = $"Score: {stateInfo.Score}";
+            
         }
 
-        private async void PlayAgain_ButtonClick(object sender, RoutedEventArgs e)
+
+        //EVENT HANDLERS
+        
+        private void Restart_ButtonClick(object sender, RoutedEventArgs e)
         {
-            stateInfo = new StateInfo();
             GameOverScreen.Visibility = Visibility.Hidden;
-            await GameLoop();
+            PauseScreen.Visibility = Visibility.Hidden;
+            stateInfo.Restart();
+            stateInfo.Newgame();
         }
-
+        private void Menu_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            PauseScreen.Visibility = Visibility.Hidden;
+            GameOverScreen.Visibility = Visibility.Hidden;
+            MenuScreen.Visibility = Visibility.Visible;
+            stateInfo.Restart(); 
+            stateInfo.ToMenu();
+            Draw(stateInfo); 
+        }
+        private void Resume_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            PauseScreen.Visibility = Visibility.Hidden; 
+            stateInfo.Resume();
+        }
         private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (stateInfo.GameOver)
+            if (stateInfo.stateMode != StateInfo.StateMode.Playing)
             {
                 return;
             }
@@ -185,6 +221,7 @@ namespace Tetrish
                     break;
                 case Key.E:
                 case Key.Up:
+                case Key.X:
                     stateInfo.RotatePieceClock();
                     break;
                 case Key.S:
@@ -201,14 +238,24 @@ namespace Tetrish
                 case Key.Space:
                     stateInfo.DropPiece();
                     break;
+                case Key.Escape:
+                    stateInfo.Pause();
+                    PauseScreen.Visibility= Visibility.Visible;
+                    break;
                 default:
                     return;
             }
 
             Draw(stateInfo);
         }
+        private void Start_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            stateInfo.Restart();
+            stateInfo.Newgame();
+            MenuScreen.Visibility= Visibility.Hidden;
+        }
 
-        private async void GameBoard_Loaded(object sender, RoutedEventArgs e)
+        private async void Game_Loaded(object sender, RoutedEventArgs e)
         {
             await GameLoop();
         }

@@ -12,11 +12,11 @@ namespace Tetrish
 {
     internal class GameBoard
     {
-        const int ROWS = 22;
-        const int COLS = 10;
-        private readonly int[,] grid;
-        public int Rows { get; }
-        public int Columns { get; }
+        public int ROWS { get => 22; }
+        public int COLS { get => 10; }
+        private int[,] grid { get; set; }
+        //public int Rows { get; private set; }
+        //public int Columns { get; private set; }
 
         public int this[int r, int c]
         {
@@ -26,8 +26,7 @@ namespace Tetrish
         
         public GameBoard()
         { 
-            Rows = ROWS; Columns = COLS;
-            grid = new int[Rows, Columns];
+            grid = new int[ROWS, COLS];
         }
 
         private bool InBoard(int r, int c)
@@ -84,7 +83,7 @@ namespace Tetrish
         {
             int cleared = 0;
 
-            for (int r = Rows - 1; r >= 0; r--)
+            for (int r = ROWS - 1; r >= 0; r--)
                 {
                 if (IsRowFull(r))
                 {

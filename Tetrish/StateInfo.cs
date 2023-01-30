@@ -29,24 +29,67 @@ namespace Tetrish
                 }
             }
         }
+        public enum StateMode
+        {
+            Menu = 0,
+            Playing = 1,
+            Paused = 2,
+            GameOver = 3
+        }
+        public StateMode stateMode { get; private set; }
 
-        public GameBoard GameBoard { get; }
-        public PiecePicker PiecePicker { get; }
+        public GameBoard GameBoard { get; private set; }
+        public PiecePicker PiecePicker { get; private set; }
         public bool GameOver { get; private set; }
         public int Score { get; private set; }
         public int Level { get; private set; }
-        private int LinesCleared = 0;
-        public Piece HeldPiece { get; private set; }
+        private int LinesCleared;
+        public Piece? HeldPiece { get; private set; }
         public bool CanHold { get; private set; }
 
         public StateInfo()
         {
+            currentPiece = new BlankPiece();
             GameBoard = new GameBoard();
             PiecePicker = new PiecePicker();
-            Level = 1;
-            currentPiece = PiecePicker.NewPiece();
+            stateMode = StateMode.Menu;
+        }
+
+        public void ToMenu()
+        {
+            GameOver = false;
+            stateMode = StateMode.Menu;
+        }
+
+        public void Restart()
+        {
+            currentPiece = new BlankPiece();
+            GameBoard = new GameBoard();
+            PiecePicker = new PiecePicker();
+            LinesCleared = 0;
+            Score = 0;
+            Level = 1; 
+            HeldPiece = null;
             CanHold = true;
         }
+
+        public void Newgame()
+        {
+            currentPiece = PiecePicker.NewPiece();
+            stateMode = StateMode.Playing;
+            GameOver = false;
+        }
+
+        public void Resume()
+        {
+            stateMode = StateMode.Playing;
+        }
+
+        public void Pause()
+        {
+            stateMode = StateMode.Paused;
+        }
+        
 
         private bool PieceFits()
         {
@@ -59,7 +102,6 @@ namespace Tetrish
             }
             return true;
         }
-
         public void HoldPiece()
         {
             if (!CanHold)
@@ -80,35 +122,9 @@ namespace Tetrish
 
             CanHold = false;
         }
-
-        public void RotatePieceClock()
-        {
-            CurrentPiece.RotateClockwise();
-
-            if (!PieceFits())
-            {
-                CurrentPiece.RotateAntiClockwise();
-            }
-        }
-
-        public void RotatePieceAntiClock()
-        {
-            CurrentPiece.RotateAntiClockwise();
-
-            if (!PieceFits())
-            {
-                CurrentPiece.RotateClockwise();
-            }
-        }
-
-        private bool IsGameEnd()
-        {
-            return !(GameBoard.IsRowEmpty(0) && GameBoard.IsRowEmpty(1));
-        }
-
         private void PlacePiece()
         {
-            foreach(Position p in CurrentPiece.TilePositions())
+            foreach (Position p in CurrentPiece.TilePositions())
             {
                 GameBoard[p.row, p.column] = CurrentPiece.Id;
             }
@@ -118,10 +134,11 @@ namespace Tetrish
             {
                 LevelUp();
             }
-            
+
 
             if (IsGameEnd())
             {
+                stateMode = StateMode.GameOver;
                 GameOver = true;
             }
             else
@@ -130,14 +147,17 @@ namespace Tetrish
                 CanHold = true;
             }
         }
-
+        private bool IsGameEnd()
+        {
+            return !(GameBoard.IsRowEmpty(0) && GameBoard.IsRowEmpty(1));
+        }
+        
         private void LevelUp()
         {
             Level++;
             LinesCleared %= 10;
         }
-
-        public int CalculateScore()
+        private int CalculateScore()
         {
             int points = 0;
             int Cleared = GameBoard.ClearRows();
@@ -160,6 +180,24 @@ namespace Tetrish
             return points * Level;
         }
 
+        public void RotatePieceClock()
+        {
+            CurrentPiece.RotateClockwise();
+
+            if (!PieceFits())
+            {
+                CurrentPiece.RotateAntiClockwise();
+            }
+        }
+        public void RotatePieceAntiClock()
+        {
+            CurrentPiece.RotateAntiClockwise();
+
+            if (!PieceFits())
+            {
+                CurrentPiece.RotateClockwise();
+            }
+        }
         public void MovePieceDown()
         {
             CurrentPiece.Move(1, 0);
@@ -170,7 +208,6 @@ namespace Tetrish
                 PlacePiece();
             }
         }
-
         public void MovePieceLeft()
         {
             CurrentPiece.Move(0, -1);
@@ -180,7 +217,6 @@ namespace Tetrish
                 CurrentPiece.Move(0, 1);
             }
         }
-
         public void MovePieceRight()
         {
             CurrentPiece.Move(0, 1);
@@ -189,6 +225,11 @@ namespace Tetrish
             {
                 CurrentPiece.Move(0, -1);
             }
+        }
+        public void DropPiece()
+        {
+            CurrentPiece.Move(PieceDropDistance(), 0);
+            PlacePiece();
         }
 
         private int TileDropDistance(Position p)
@@ -202,10 +243,9 @@ namespace Tetrish
 
             return drop;
         }
-
         public int PieceDropDistance()
         {
-            int drop = GameBoard.Rows;
+            int drop = GameBoard.ROWS;
 
             foreach(Position p in CurrentPiece.TilePositions())
             {
@@ -215,10 +255,6 @@ namespace Tetrish
             return drop;
         }
 
-        public void DropPiece()
-        {
-            CurrentPiece.Move(PieceDropDistance(), 0);
-            PlacePiece();
-        }
+        
     }
 }

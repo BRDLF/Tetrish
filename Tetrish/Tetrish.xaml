@@ -9,24 +9,8 @@
         MinHeight="380" MinWidth="320" Foreground="Black"
         KeyDown="Window_KeyDown" FontFamily="Corbel" FontSize="20" Background="White">
     <Window.Resources>
-
-        <local:GameBoard x:Key="gameBoard" />
-
-        <DataTemplate x:Key="lvl2">
-            <Image Source="{Binding}" Height="10" Width="10" />
-        </DataTemplate>
-
-        <DataTemplate x:Key="lvl1">
-            <ItemsControl ItemsSource="{Binding}" ItemTemplate="{DynamicResource lvl2}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-        </DataTemplate>
-
     </Window.Resources>
+    
     <Grid x:Name="OuterGrid" Background="#FF9570FF">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -43,8 +27,7 @@
             <Canvas x:Name="GameBoard" Background="Black" Width="160"
                     Height="326"
                     Margin="0,10,0,10"
-                    ClipToBounds="True"
-                    Loaded="GameBoard_Loaded"/>
+                    ClipToBounds="True"/>
         </Viewbox>
 
         <Viewbox Grid.Row="1" Grid.Column="2"
@@ -104,15 +87,64 @@
                            FontSize="36"
                            TextAlignment="Center" Foreground="White"/>
 
+                <Button Content="Menu"
+                        Background="#FFFFFA70" 
+                        Margin="0,30,0,30"
+                        Padding="5"
+                        Click="Menu_ButtonClick"/>
+                
                 <Button Content="Play Again"
                         Background="#FFFFFA70" 
                         Margin="0,30,0,0"
                         Padding="5"
-                        Click="PlayAgain_ButtonClick"/>
-
+                        Click="Restart_ButtonClick"/>
 
             </StackPanel>
         </Grid>
+
+        <Grid x:Name="MenuScreen"
+              Grid.ColumnSpan="4"
+              Grid.RowSpan="2"
+              Visibility="Visible"
+              Background="#7F000000" Loaded="Game_Loaded">
+            <StackPanel Margin="20,20,19,20" VerticalAlignment="Center">
+                <TextBlock Text="Tetrish" Foreground="White" HorizontalAlignment="Center" FontSize="48" />
+
+                <Button Content="Start"
+                        Background="#FFFFFA70" 
+                        Margin="0,30,0,0"
+                        Padding="5"
+                        Click="Start_ButtonClick"/>
+
+            </StackPanel>
+
+        </Grid>
+
+        <Grid x:Name="PauseScreen"
+              Grid.ColumnSpan="4"
+              Grid.RowSpan="2"
+              Visibility="Hidden" Background="#7F000000">
+
+            <StackPanel Margin="20,20,19,20" VerticalAlignment="Center">
+                <Button Content="Resume"
+                        Background="#FFFFFA70" 
+                        Margin="0,30,0,0"
+                        Padding="5"
+                        Click="Resume_ButtonClick"/>
+
+                <Button Content="Restart"
+                        Background="#FFFFFA70" 
+                        Margin="0,30,0,0"
+                        Padding="5"
+                        Click="Restart_ButtonClick"/>
+
+                <Button Content="Menu"
+                        Background="#FFFFFA70" 
+                        Margin="0,30,0,30"
+                        Padding="5"
+                        Click="Menu_ButtonClick"/>
+            </StackPanel>
+        </Grid>
     </Grid>
-    
+
 </Window>
